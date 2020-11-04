@@ -6,7 +6,7 @@ const say = require('say')
 const client = new Discord.Client();
 const queue = new Map();
 
-const interval;
+let interval;
 /*
  1.cd to this folder
  2.type < npm install > in command prompt to get node modules
