@@ -12,7 +12,7 @@
     "glob": "^7.1.6",
     "rimraf": "^3.0.2",
     "say": "^0.16.0",
-    "ytdl-core": "^3.2.2"
+    "ytdl-core": "^3.4.2"
   },
   "devDependencies": {},
   "scripts": {
