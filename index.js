@@ -321,4 +321,4 @@ function play(guild, song) {
    })
 }
 */
-client.login('your token');
+client.login(token);
