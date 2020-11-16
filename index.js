@@ -1,18 +1,14 @@
 const Discord = require('discord.js');
 const { prefix, token} = require("./config.json");
 const say = require('say')
+//const ytdl = require('ytdl-core')
 
-
-const client = new Discord.Client();
-const queue = new Map();
+const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
+//const queue = new Map();
 
 let interval;
-/*
- 1.cd to this folder
- 2.type < npm install > in command prompt to get node modules
- 3.put your disocrd bot token at the bottom
- 4.run < node . > in command prompt 
-*/
+let all = new Array();
+let intc = 0;
 
 client.on("ready", () => {
 console.log(`${client.user.bot} is online`)
@@ -22,18 +18,17 @@ client.user.setPresence({ activity: {type:'LISTENING', name: `${prefix}help` },
 });
 
 client.on("message", async message => {
+//const serverQueue = queue.get(message.guild.id);
+
+//if(message.type === "PINS_ADD") message.delete()
 
 if (message.author.bot)  return;
-
-
-const serverQueue = queue.get(message.guild.id);
-
-say.speak(message.content)
 
 if (!message.content.startsWith(prefix)) return;
 
 
-if(message.content.startsWith(`${prefix}help`)) {
+if(message.content.toLowerCase().startsWith(`${prefix}help`)) {
+  //${prefix}help
   message.delete();
   let asd = client.users.cache.get(message.author.id).displayAvatarURL({format: "png", size: 2048, dynamic: true})
     const help = new Discord.MessageEmbed()
@@ -44,50 +39,93 @@ if(message.content.startsWith(`${prefix}help`)) {
       .addFields(
         {name: '建議', value:'You can create a new role called "default" for the add-permission command'},
         { name: '\u200B', value: '\u200B' },
-        { name: '音樂 :', value: '`play URL\n\np URL\n\nstop\n\nskip`', inline: true },
-        { name: '動作 :', value: '`avatar @someone\n\nbmi (height) (weight) @someone\n\nlick @someone\n\ndm @someone messages`' ,inline: true },
-        { name:'歷史紀錄 :' , value: '**started at 2020 09 20**\n`history (20xx) (months) (days)\n\nhistory bot (20xx) (months) (days)`' , inline: true },
-        { name: '動作超連結 :', value: `[🔥](${asd}): Your avatar\n[🔥](https://server-asd35084591.p.tnnl.in//)`, inline: true },
-        { name: '\u200B', value: '\u200B' }
+        { name: '~~音樂 :~~', value: '~~`play URL\n\np URL\n\nstop\n\nskip`~~', inline: true },
+        { name: '動作 :', value: '`avatar\n\n bmi\n\n dm\n\n\ time  count\n\n roll\n\n tts\n\n embed`' ,inline: true }
         )
       .setTimestamp()
       message.channel.send(help)
       return;
 
-} else if(message.content.startsWith(`${prefix}time`)) {
-      let asd;
-      message.delete()
-      asd=await message.channel.send({embed:{title:Date(Date.now()).slice(0,24)}})
-     // if (!interval) {
-        interval = setInterval(()=>{
-          asd.edit({embed:{title:Date(Date.now()).slice(0,24)}})
-            },3000)
-          //}
-         
-} else if(message.content===`${prefix}x`){
-          message.delete()
-          clearInterval(interval)
-          interval = null;
-          return;
-    
-/*music*/} else if (message.content===`${prefix}play`) {
+} else if(message.content.toLowerCase()===`${prefix}time`) {
+  //${prefix}time
+  let asd;
+  message.delete()
+  asd=await message.channel.send({embed:{title:Date(Date.now()).slice(0,24)}})
+  asd.react('💡')
+  asd.pin()
+  interval = setInterval(()=>{
+    asd.edit({embed:{title:Date(Date.now()).slice(0,24)}})
+  },3000)
+  all.push(asd.id,interval)
+  intc = intc+1
+  return;
+} else if(message.content.toLowerCase()===`${prefix}count`) {
+  //${prefix}count
+  message.delete()
+    //count.forEach(()=> {
+    //console.log(test)  
+    //})
+  if(intc === 0){message.reply('no intervals running rn')
+    .then(mes =>{mes.delete({timeout:[3000]})})
+    return;}
+  if(intc<=-1){
+    message.reply(`reset the timer from ${intc} to 0`)
+    .then(mes =>{mes.delete({timeout:[3000]})})
+    .catch(err=>{console.log(err)})
+     intc =0 
+    return;}
+  message.channel.send(`interval counts : ${intc}`)
+  .then(msg=>{msg.delete({timeout:[3000]})})
+
+} else if(message.content.toLowerCase()===`${prefix}roll`) {
+  //${prefix}roll
+  message.delete()
+  let dice = Math.floor( Math.random() *6 ) +1
+  if(dice){
+    if(dice==6){
+      message.channel.send(`OMG!! ${message.author.username} 難以置信!!,竟然擲出了6點!`)
+      //.then(msg=>{msg.delete({timeout:[5000]})})
+    } else if(dice==1){
+      message.channel.send(`${message.author.username} 悲慘...擲出1點的你真可憐`)
+      //.then(msg=>{msg.delete({timeout:[10000]})})
+    } else{
+      message.channel.send(`擲了`+ dice +`點`)
+      .then(msg=>{msg.delete({timeout:[2000]})})
+    }
+  }
+} else if(message.content.toLowerCase().startsWith(`${prefix}embed`)) {
+  message.delete()
+  let args = message.content.split(" ");
+      args.splice(0,1);
+  let temp = args.join(' ')
+  const embed = new Discord.MessageEmbed()
+  .setAuthor(message.author.tag)
+  .setDescription(temp)
+  .setTimestamp()
+  message.channel.send(embed)
+  .catch(err=>{console.log(err)})
+
+/*音樂指令目前因為解碼問題無法使用
+
+} else if (message.content===`${prefix}play`) {
     message.delete({ timeout: 1000 });
     execute(message, serverQueue);
     return;
-/*music*/} else if (message.content===`${prefix}p`) {
+} else if (message.content===`${prefix}p`) {
     message.delete({ timeout: 1000 });
     execute(message, serverQueue);
     return;
-/*music*/} else if (message.content===`${prefix}skip`) {
+} else if (message.content===`${prefix}skip`) {
     message.delete({ timeout: 1000 });
     skip(message, serverQueue);
-    return;
-/*music*/} else if (message.content===`${prefix}stop`) {
+    return;} else if (message.content===`${prefix}stop`) {
     message.delete({ timeout: 1000 });
     stop(message, serverQueue);
     return;
+*/
 
 /*action*/} else if (message.content.startsWith(`${prefix}avatar`)) {
+  //${prefix}avatar @tagSomeone
       message.delete();
       let embed = new Discord.MessageEmbed();
       if(!message.mentions.users.first()) {
@@ -108,11 +146,9 @@ if(message.content.startsWith(`${prefix}help`)) {
         //console.log(typeof user);
       }
 /*action*/} else if (message.content.startsWith(`${prefix}bmi`)) {
+  //${prefix}bmi 身高 體重 @tagSomeone
     message.delete();
-    if(!message.mentions.users.first()) {
-      message.channel.send(`You need to tag someone${message.author.toString()}`);
-      return;}
-      else{
+
     let user = message.mentions.users.first();
     const args = message.content.split(" ");
     let height = args[1];
@@ -120,9 +156,15 @@ if(message.content.startsWith(`${prefix}help`)) {
     let asd = height*height/10000;
     const bmi = (weight/asd);
     const ans = Math.round(bmi*1000)/1000;
+
+    if(!message.mentions.users.first()) {
+      message.channel.send(`Your bmi indexs ${ans}`);
+    return;}
+      else{
     message.channel.send(`${user.username}的bmi值為${ans}`);}
 
 /*action*/} else if (message.content.startsWith(`${prefix}dm`)) {
+  //${prefix}dm @tagSomeone YourMessages
     message.delete();
     let args = message.content.split(" ");
     let dUser = message.guild.member(message.mentions.users.first());
@@ -136,6 +178,7 @@ if(message.content.startsWith(`${prefix}help`)) {
     message.author.send(`You have sent your message : " ***${dm}***  " to ${dUser}`)
 
 } else if (message.content===`${prefix}test`) {
+  //${prefix}test
   message.delete();
   let asd= client.user.username
   message.channel.send(`${asd} is online`)
@@ -144,15 +187,16 @@ if(message.content.startsWith(`${prefix}help`)) {
   })
   
 } else if (message.content.startsWith(`${prefix}tts`)){
+  //${prefix}tts YourMessages
     message.delete()
     let args = message.content.split(" ");
     args.splice(0,1);
     let dm = args.join(" ")
     say.speak(dm)
-    let path = `./text-to-speak/${message.author.username}-${dm}.wav`
+    let path = `./tts-files/${message.author.username}-${dm}.wav`
     say.export(dm,'Alex',1,`${path}`)
     setTimeout(()=>{
-      message.author.send({files:[`${path}`]})
+      message.author.send(`Your tts file`,{files:[`${path}`]})
     },3000)
 
 } else {message.channel.send("You need to enter a valid command!")
@@ -163,6 +207,22 @@ if(message.content.startsWith(`${prefix}help`)) {
 
 })
 
+client.on('messageReactionAdd', async(reaction,user)=>{
+  if(reaction.message.partial) await reaction.message.fetch();
+  if(reaction.partial) await reaction.fetch();
+  if(user.bot) return
+  if(!reaction.message.guild) return
+    if(reaction.emoji.name===`💡`) {
+      let one =all.indexOf(reaction.message.id)
+      let fin = one +1
+      clearInterval(all[fin])
+      reaction.message.channel.messages.fetch(reaction.message.id)
+      .then(msg=>{msg.delete()})
+      intc = intc-1;
+     all.splice(one,2)
+    }
+})
+/*
 async function execute(message, serverQueue) {
   const args = message.content.split(" ");
 
@@ -260,5 +320,5 @@ function play(guild, song) {
     msg.delete({ timeout: 5000 });
    })
 }
-
-client.login('your bot token');
+*/
+client.login('your token');
