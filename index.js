@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { prefix, token} = require("./config.json");
+const { prefix, token01 ,token02} = require("./config.json");
 const say = require('say')
 //const ytdl = require('ytdl-core')
 
@@ -321,4 +321,4 @@ function play(guild, song) {
    })
 }
 */
-client.login(token);
+client.login(token01+token02);
