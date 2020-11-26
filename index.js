@@ -9,6 +9,8 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 let interval;
 let all = new Array();
 let intc = 0;
+const helparray = new Array();
+let helpcount =0;
 
 client.on("ready", () => {
 console.log(`${client.user.bot} is online`)
@@ -33,17 +35,21 @@ if(message.content.toLowerCase().startsWith(`${prefix}help`)) {
   let asd = client.users.cache.get(message.author.id).displayAvatarURL({format: "png", size: 2048, dynamic: true})
     const help = new Discord.MessageEmbed()
       .setTitle(`**Guide**`)
-      .setDescription('前綴 : ***-***\n***貼圖使用兩個前綴***')
       .setAuthor(`[ ${message.guild.name} ]`)
       .setColor('#0099E1')
-      .addFields(
-        {name: '建議', value:'You can create a new role called "default" for the add-permission command'},
-        { name: '\u200B', value: '\u200B' },
-        { name: '~~音樂 :~~', value: '~~`play URL\n\np URL\n\nstop\n\nskip`~~', inline: true },
-        { name: '動作 :', value: '`avatar\n\n bmi\n\n dm\n\n\ time  count\n\n roll\n\n tts\n\n embed`' ,inline: true }
-        )
       .setTimestamp()
-      message.channel.send(help)
+      const help00 = new Discord.MessageEmbed()
+      .setDescription('前綴 : ***-***\n***貼圖使用兩個前綴***')
+      .addFields({name: '大頭貼\n', value:`${asd}`})
+      const help01 = new Discord.MessageEmbed()
+      .addFields({ name: '~~音樂 :~~', value: '~~`play URL\n\np URL\n\nstop\n\nskip`~~', inline: true })
+      const help02 = new Discord.MessageEmbed()
+      .addFields({ name: '動作 :', value: '`avatar\n\n bmi\n\n dm\n\n\ time  count\n\n roll\n\n tts\n\n embed`' ,inline: true })
+      if(helparray.length<1){
+        helparray.push(help,help00,help01,help02)}
+        //console.log(helpary)
+       let p = await message.channel.send(help).catch(err=>{console.log(err)})
+       p.react('👉')
       return;
 
 } else if(message.content.toLowerCase()===`${prefix}time`) {
@@ -220,6 +226,63 @@ client.on('messageReactionAdd', async(reaction,user)=>{
       .then(msg=>{msg.delete()})
       intc = intc-1;
      all.splice(one,2)
+    }
+    if(reaction.emoji.name===`👉`) {
+      helpcount = helpcount+1
+
+      if(helpcount===helpary.length-1) {
+        reaction.message.reactions.cache.get(`👉`).remove()
+        reaction.message.reactions.cache.get(`👈`).remove()
+        reaction.message.channel.messages.fetch(reaction.message.id)
+      .then(msg=>{
+        msg.edit(helpary[helpcount])
+        msg.react(`👈`)
+      })
+      }
+      else if(helpcount===0) {
+        reaction.message.reactions.cache.get(`👉`).remove()
+        reaction.message.reactions.cache.get(`👈`).remove()
+        reaction.message.channel.messages.fetch(reaction.message.id)
+      .then(msg=>{
+        msg.edit(helpary[helpcount-1])
+        msg.react(`👉`)})
+      } else{
+        reaction.message.reactions.cache.get(`👉`).remove()
+        reaction.message.channel.messages.fetch(reaction.message.id)
+        .then(msg=>{
+          msg.edit(helpary[helpcount])
+          msg.react(`👈`)
+          msg.react(`👉`)
+        })}
+  }
+    if(reaction.emoji.name==='👈') {
+
+      helpcount = helpcount-1
+      if(helpcount===0) {
+        reaction.message.reactions.cache.get(`👉`).remove()
+        reaction.message.reactions.cache.get(`👈`).remove()
+        reaction.message.channel.messages.fetch(reaction.message.id)
+      .then(msg=>{
+        msg.edit(helpary[helpcount])
+        msg.react(`👉`)
+      })
+      } else if(helpcount===helpary.length) {
+        reaction.message.reactions.cache.get(`👉`).remove()
+        reaction.message.reactions.cache.get(`👈`).remove()
+        reaction.message.channel.messages.fetch(reaction.message.id)
+      .then(msg=>{
+        msg.edit(helpary[helpcount-1])
+        msg.react(`👉`)})
+      } else{
+        if(helpary.length-helpcount>2){
+        reaction.message.reactions.cache.get(`👉`).remove()}
+        reaction.message.reactions.cache.get(`👈`).remove()
+        reaction.message.channel.messages.fetch(reaction.message.id)
+        .then(msg=>{
+          msg.edit(helpary[helpcount])
+          msg.react(`👈`)
+          msg.react(`👉`)
+        })}
     }
 })
 /*
