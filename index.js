@@ -231,22 +231,15 @@ client.on('messageReactionAdd', async(reaction,user)=>{
       helpcount = helpcount+1
 
       if(helpcount===helpary.length-1) {
+        console.log(`終點`)
         reaction.message.reactions.cache.get(`👉`).remove()
         reaction.message.reactions.cache.get(`👈`).remove()
         reaction.message.channel.messages.fetch(reaction.message.id)
       .then(msg=>{
         msg.edit(helpary[helpcount])
-        msg.react(`👈`)
-      })
-      }
-      else if(helpcount===0) {
-        reaction.message.reactions.cache.get(`👉`).remove()
-        reaction.message.reactions.cache.get(`👈`).remove()
-        reaction.message.channel.messages.fetch(reaction.message.id)
-      .then(msg=>{
-        msg.edit(helpary[helpcount-1])
-        msg.react(`👉`)})
+        msg.react(`👈`)})
       } else{
+        console.log(`前進`)
         reaction.message.reactions.cache.get(`👉`).remove()
         reaction.message.channel.messages.fetch(reaction.message.id)
         .then(msg=>{
@@ -259,23 +252,17 @@ client.on('messageReactionAdd', async(reaction,user)=>{
 
       helpcount = helpcount-1
       if(helpcount===0) {
+        console.log(`起點`)
         reaction.message.reactions.cache.get(`👉`).remove()
         reaction.message.reactions.cache.get(`👈`).remove()
         reaction.message.channel.messages.fetch(reaction.message.id)
       .then(msg=>{
         msg.edit(helpary[helpcount])
-        msg.react(`👉`)
-      })
-      } else if(helpcount===helpary.length) {
-        reaction.message.reactions.cache.get(`👉`).remove()
-        reaction.message.reactions.cache.get(`👈`).remove()
-        reaction.message.channel.messages.fetch(reaction.message.id)
-      .then(msg=>{
-        msg.edit(helpary[helpcount-1])
         msg.react(`👉`)})
       } else{
         if(helpary.length-helpcount>2){
         reaction.message.reactions.cache.get(`👉`).remove()}
+        console.log(`後退`)
         reaction.message.reactions.cache.get(`👈`).remove()
         reaction.message.channel.messages.fetch(reaction.message.id)
         .then(msg=>{
